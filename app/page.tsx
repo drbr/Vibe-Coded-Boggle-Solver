@@ -92,10 +92,10 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-[#f9f5eb]">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">{loadingMessage}</h2>
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <h2 className="text-2xl font-bold mb-4 text-boggle-accent">{loadingMessage}</h2>
+          <div className="w-16 h-16 border-4 border-boggle-accent border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       </div>
     )
@@ -103,8 +103,8 @@ export default function Home() {
 
   return (
     <TooltipProvider>
-      <main className="flex min-h-screen flex-col items-center p-4 md:p-8">
-        <h1 className="text-3xl font-bold mb-2">Boggle Solver</h1>
+      <main className="flex min-h-screen flex-col items-center p-4 md:p-8 bg-[#f9f5eb]">
+        <h1 className="boggle-title text-4xl font-bold mb-2">BOGGLE SOLVER</h1>
         <p className="text-muted-foreground mb-6">
           Using {dictionarySize.toLocaleString()} words from the Scrabble dictionary
         </p>

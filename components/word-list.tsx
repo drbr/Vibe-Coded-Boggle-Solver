@@ -28,8 +28,8 @@ export default function WordList({ words, selectedWord, onWordClick }: WordListP
   if (words.length === 0) {
     return (
       <div className="h-full overflow-hidden flex flex-col">
-        <h2 className="text-xl font-semibold mb-2">Found Words: 0</h2>
-        <div className="border rounded-md p-4 h-full flex items-center justify-center">
+        <h2 className="boggle-subtitle text-xl font-semibold mb-2">FOUND WORDS: 0</h2>
+        <div className="word-list p-4 h-full flex items-center justify-center">
           <p className="text-muted-foreground text-center">No words found on this board. Try generating a new board.</p>
         </div>
       </div>
@@ -38,23 +38,20 @@ export default function WordList({ words, selectedWord, onWordClick }: WordListP
 
   return (
     <div className="h-full overflow-hidden flex flex-col">
-      <h2 className="text-xl font-semibold mb-2">Found Words: {words.length}</h2>
+      <h2 className="boggle-subtitle text-xl font-semibold mb-2">FOUND WORDS: {words.length}</h2>
 
-      <div className="overflow-y-auto border rounded-md p-4 h-full">
+      <div className="word-list overflow-y-auto p-4 h-full">
         {sortedLengths.map((length) => (
           <div key={length} className="mb-4">
-            <h3 className="text-md font-medium text-muted-foreground mb-2">
-              {length} Letters ({wordsByLength[length].length})
+            <h3 className="boggle-subtitle text-md font-medium text-muted-foreground mb-2">
+              {length} LETTERS ({wordsByLength[length].length})
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {wordsByLength[length].map(({ word, path }) => (
                 <button
                   key={word}
                   onClick={() => onWordClick(word, path)}
-                  className={cn(
-                    "px-3 py-1.5 text-left rounded-md hover:bg-accent",
-                    selectedWord === word ? "bg-primary text-primary-foreground" : "bg-card",
-                  )}
+                  className={cn("word-item px-3 py-1.5 text-left", selectedWord === word ? "selected" : "")}
                 >
                   {word}
                 </button>

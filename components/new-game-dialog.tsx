@@ -48,20 +48,23 @@ export function NewGameDialog({ onNewGame, isLoading, currentMode }: NewGameDial
       }}
     >
       <DialogTrigger asChild>
-        <Button className="w-full" disabled={isLoading || dialogLoading}>
+        <Button
+          className="w-full bg-boggle-accent hover:bg-boggle-accent/90 font-semibold"
+          disabled={isLoading || dialogLoading}
+        >
           {isLoading || dialogLoading ? (
             <>
               <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
-              Generating...
+              GENERATING...
             </>
           ) : (
-            "New Game"
+            "NEW GAME"
           )}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] bg-[#f9f5eb] border-[#d9c9a3]">
         <DialogHeader>
-          <DialogTitle>Generate New Game</DialogTitle>
+          <DialogTitle className="text-boggle-accent font-bold uppercase">Generate New Game</DialogTitle>
           <DialogDescription>Choose how you want to generate the Boggle board.</DialogDescription>
         </DialogHeader>
 
@@ -73,7 +76,7 @@ export function NewGameDialog({ onNewGame, isLoading, currentMode }: NewGameDial
           >
             <div className="flex items-start space-x-2">
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="boggle" id="dialog-boggle" />
+                <RadioGroupItem value="boggle" id="dialog-boggle" className="text-boggle-accent border-boggle-accent" />
                 <Label htmlFor="dialog-boggle" className="cursor-pointer font-medium">
                   Authentic Boggle Dice
                 </Label>
@@ -85,7 +88,7 @@ export function NewGameDialog({ onNewGame, isLoading, currentMode }: NewGameDial
 
             <div className="flex items-start space-x-2">
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="random" id="dialog-random" />
+                <RadioGroupItem value="random" id="dialog-random" className="text-boggle-accent border-boggle-accent" />
                 <Label htmlFor="dialog-random" className="cursor-pointer font-medium">
                   Random Letters
                 </Label>
@@ -98,11 +101,20 @@ export function NewGameDialog({ onNewGame, isLoading, currentMode }: NewGameDial
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)} disabled={dialogLoading}>
-            Cancel
+          <Button
+            variant="outline"
+            onClick={() => setOpen(false)}
+            disabled={dialogLoading}
+            className="border-[#d9c9a3] hover:bg-[#f0e6d2] hover:text-foreground font-medium"
+          >
+            CANCEL
           </Button>
-          <Button onClick={handleGenerate} disabled={dialogLoading}>
-            Generate Board
+          <Button
+            onClick={handleGenerate}
+            disabled={dialogLoading}
+            className="bg-boggle-accent hover:bg-boggle-accent/90 font-medium"
+          >
+            GENERATE BOARD
           </Button>
         </DialogFooter>
       </DialogContent>

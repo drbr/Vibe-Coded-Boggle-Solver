@@ -24,11 +24,11 @@ export default function BoggleBoard({
   if (!board.length) return <div>Loading...</div>
 
   return (
-    <div className="relative grid grid-cols-4 gap-2 aspect-square w-full max-w-md mx-auto">
+    <div className="boggle-board relative grid grid-cols-4 gap-2 aspect-square w-full max-w-md mx-auto">
       {loading && (
         <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 rounded-lg">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          <p className="mt-4 text-primary font-medium">{loadingMessage}</p>
+          <div className="w-12 h-12 border-4 border-boggle-accent border-t-transparent rounded-full animate-spin"></div>
+          <p className="mt-4 text-boggle-accent font-medium">{loadingMessage}</p>
         </div>
       )}
 
@@ -37,16 +37,14 @@ export default function BoggleBoard({
           <div
             key={`${rowIndex}-${colIndex}`}
             className={cn(
-              "flex items-center justify-center rounded-lg text-2xl font-bold aspect-square border-2",
-              isInPath(rowIndex, colIndex)
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-card text-card-foreground border-border",
+              "boggle-dice flex items-center justify-center text-2xl font-bold aspect-square",
+              isInPath(rowIndex, colIndex) && "selected",
             )}
           >
             <div className="relative">
               {letter.toUpperCase()}
               {isInPath(rowIndex, colIndex) && (
-                <span className="absolute -top-3 -right-3 bg-secondary text-secondary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="path-number absolute -top-3 -right-3 text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {getPathIndex(rowIndex, colIndex) + 1}
                 </span>
               )}
