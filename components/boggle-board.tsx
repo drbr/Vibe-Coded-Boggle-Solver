@@ -3,9 +3,10 @@ import { cn } from "@/lib/utils"
 interface BoggleBoardProps {
   board: string[][]
   selectedPath: number[][]
+  loading?: boolean
 }
 
-export default function BoggleBoard({ board, selectedPath }: BoggleBoardProps) {
+export default function BoggleBoard({ board, selectedPath, loading = false }: BoggleBoardProps) {
   const isInPath = (row: number, col: number) => {
     return selectedPath.some(([r, c]) => r === row && c === col)
   }
@@ -17,7 +18,16 @@ export default function BoggleBoard({ board, selectedPath }: BoggleBoardProps) {
   if (!board.length) return <div>Loading...</div>
 
   return (
-    <div className="grid grid-cols-4 gap-2 aspect-square w-full max-w-md mx-auto">
+    <div className="relative grid grid-cols-4 gap-2 aspect-square w-full max-w-md mx-auto">
+      {loading && (
+        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg">
+          <div className="flex flex-col items-center">
+            <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <p className="mt-4 text-primary font-medium">Finding words...</p>
+          </div>
+        </div>
+      )}
+
       {board.map((row, rowIndex) =>
         row.map((letter, colIndex) => (
           <div

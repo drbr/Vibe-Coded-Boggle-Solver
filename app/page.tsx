@@ -6,6 +6,10 @@ import WordList from "@/components/word-list"
 import { findAllWords } from "@/lib/boggle-solver"
 import { generateRandomBoard, generateBoggleDiceBoard } from "@/lib/board-generator"
 import { loadDictionary, isDictionaryLoaded, getDictionarySize } from "@/lib/dictionary"
+import { TooltipProvider } from "@/components/ui/tooltip"
+import { NewGameDialog } from "@/components/new-game-dialog"
+
+type BoardMode = "boggle" | "random"
 
 export default function Home() {
   const [board, setBoard] = useState<string[][]>([])
@@ -13,8 +17,9 @@ export default function Home() {
   const [selectedWord, setSelectedWord] = useState<string | null>(null)
   const [selectedPath, setSelectedPath] = useState<number[][]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [gameLoading, setGameLoading] = useState(false)
   const [dictionarySize, setDictionarySize] = useState(0)
-  const [useRealDice, setUseRealDice] = useState(true)
+  const [boardMode, setBoardMode] = useState<BoardMode>("boggle")
 
   useEffect(() => {
     const initializeGame = async () => {
@@ -25,7 +30,7 @@ export default function Home() {
         setDictionarySize(getDictionarySize())
 
         // Then start a new game
-        await newGame()
+        await generateNewGame(boardMode)
       } catch (error) {
         console.error("Failed to initialize game:", error)
       } finally {
@@ -36,31 +41,39 @@ export default function Home() {
     initializeGame()
   }, [])
 
-  const newGame = async () => {
-    if (!isDictionaryLoaded()) {
-      await loadDictionary()
+  const generateNewGame = async (mode: BoardMode) => {
+    setGameLoading(true)
+
+    try {
+      if (!isDictionaryLoaded()) {
+        await loadDictionary()
+      }
+
+      // Update the mode if it changed
+      if (mode !== boardMode) {
+        setBoardMode(mode)
+      }
+
+      // Generate a new board using either real Boggle dice or random letters
+      const newBoard = mode === "boggle" ? generateBoggleDiceBoard(4, 4) : generateRandomBoard(4, 4)
+      setBoard(newBoard)
+
+      const foundWords = findAllWords(newBoard)
+      setWords(foundWords)
+      setSelectedWord(null)
+      setSelectedPath([])
+
+      return foundWords
+    } catch (error) {
+      console.error("Error generating new game:", error)
+    } finally {
+      setGameLoading(false)
     }
-
-    // Generate a new board using either real Boggle dice or random letters
-    const newBoard = useRealDice ? generateBoggleDiceBoard(4, 4) : generateRandomBoard(4, 4)
-    setBoard(newBoard)
-
-    const foundWords = findAllWords(newBoard)
-    setWords(foundWords)
-    setSelectedWord(null)
-    setSelectedPath([])
-
-    return foundWords
   }
 
   const handleWordClick = (word: string, path: number[][]) => {
     setSelectedWord(word)
     setSelectedPath(path)
-  }
-
-  const toggleDiceMode = () => {
-    setUseRealDice(!useRealDice)
-    newGame()
   }
 
   if (isLoading) {
@@ -75,35 +88,33 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-4 md:p-8">
-      <h1 className="text-3xl font-bold mb-2">Boggle Solver</h1>
-      <p className="text-muted-foreground mb-6">
-        Using {dictionarySize.toLocaleString()} words from the Scrabble dictionary
-      </p>
+    <TooltipProvider>
+      <main className="flex min-h-screen flex-col items-center p-4 md:p-8">
+        <h1 className="text-3xl font-bold mb-2">Boggle Solver</h1>
+        <p className="text-muted-foreground mb-6">
+          Using {dictionarySize.toLocaleString()} words from the Scrabble dictionary
+        </p>
 
-      <div className="flex flex-col md:flex-row w-full max-w-4xl gap-8">
-        <div className="w-full md:w-1/2">
-          <BoggleBoard board={board} selectedPath={selectedPath} />
-          <div className="mt-4 flex gap-2">
-            <button
-              onClick={() => newGame()}
-              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md"
-            >
-              New Game
-            </button>
-            <button
-              onClick={toggleDiceMode}
-              className="flex-1 bg-secondary text-secondary-foreground hover:bg-secondary/90 px-4 py-2 rounded-md"
-            >
-              {useRealDice ? "Use Random Letters" : "Use Boggle Dice"}
-            </button>
+        <div className="flex flex-col md:flex-row w-full max-w-4xl gap-8">
+          <div className="w-full md:w-1/2">
+            <BoggleBoard board={board} selectedPath={selectedPath} loading={gameLoading} />
+
+            <div className="mt-4">
+              <NewGameDialog onNewGame={generateNewGame} isLoading={gameLoading} currentMode={boardMode} />
+            </div>
+
+            <div className="mt-4 text-sm text-muted-foreground">
+              <p>
+                <strong>Current mode:</strong> {boardMode === "boggle" ? "Authentic Boggle Dice" : "Random Letters"}
+              </p>
+            </div>
+          </div>
+
+          <div className="w-full md:w-1/2">
+            <WordList words={words} selectedWord={selectedWord} onWordClick={handleWordClick} />
           </div>
         </div>
-
-        <div className="w-full md:w-1/2">
-          <WordList words={words} selectedWord={selectedWord} onWordClick={handleWordClick} />
-        </div>
-      </div>
-    </main>
+      </main>
+    </TooltipProvider>
   )
 }
