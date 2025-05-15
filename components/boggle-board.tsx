@@ -4,9 +4,15 @@ interface BoggleBoardProps {
   board: string[][]
   selectedPath: number[][]
   loading?: boolean
+  loadingMessage?: string
 }
 
-export default function BoggleBoard({ board, selectedPath, loading = false }: BoggleBoardProps) {
+export default function BoggleBoard({
+  board,
+  selectedPath,
+  loading = false,
+  loadingMessage = "Finding words...",
+}: BoggleBoardProps) {
   const isInPath = (row: number, col: number) => {
     return selectedPath.some(([r, c]) => r === row && c === col)
   }
@@ -20,11 +26,9 @@ export default function BoggleBoard({ board, selectedPath, loading = false }: Bo
   return (
     <div className="relative grid grid-cols-4 gap-2 aspect-square w-full max-w-md mx-auto">
       {loading && (
-        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg">
-          <div className="flex flex-col items-center">
-            <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-            <p className="mt-4 text-primary font-medium">Finding words...</p>
-          </div>
+        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 rounded-lg">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="mt-4 text-primary font-medium">{loadingMessage}</p>
         </div>
       )}
 

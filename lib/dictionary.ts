@@ -1,7 +1,8 @@
 // Dictionary management and loading
+import { Trie } from "./trie"
 
-// We'll use a Set for fast lookups
-let dictionary: Set<string> = new Set()
+// We'll use a Trie for fast lookups and prefix checking
+let dictionaryTrie: Trie | null = null
 let isLoaded = false
 let isLoading = false
 
@@ -13,6 +14,7 @@ export async function loadDictionary(): Promise<void> {
   if (isLoaded || isLoading) return
 
   isLoading = true
+  console.time("Dictionary loading")
 
   try {
     const response = await fetch(DICTIONARY_URL)
@@ -21,29 +23,39 @@ export async function loadDictionary(): Promise<void> {
     }
 
     const text = await response.text()
-    const words = text.split("\n").filter((word) => word.trim().length > 0)
+    const words = text
+      .split("\n")
+      .filter((word) => word.trim().length > 0)
+      .map((word) => word.toLowerCase().trim())
+      .filter((word) => word.length >= 3 && word.length <= 16)
 
-    // Filter words to only include those that are 3-16 letters (typical Boggle rules)
-    dictionary = new Set(
-      words.map((word) => word.toLowerCase().trim()).filter((word) => word.length >= 3 && word.length <= 16),
-    )
+    console.log(`Building trie with ${words.length} words...`)
+    dictionaryTrie = Trie.fromArray(words)
 
     isLoaded = true
-    console.log(`Dictionary loaded with ${dictionary.size} words`)
+    console.log(`Dictionary loaded with ${words.length} words`)
   } catch (error) {
     console.error("Error loading dictionary:", error)
     throw error
   } finally {
     isLoading = false
+    console.timeEnd("Dictionary loading")
   }
 }
 
 export function isValidWord(word: string): boolean {
-  return dictionary.has(word.toLowerCase())
+  if (!dictionaryTrie) return false
+  return dictionaryTrie.search(word.toLowerCase())
+}
+
+export function hasWordWithPrefix(prefix: string): boolean {
+  if (!dictionaryTrie) return false
+  return dictionaryTrie.startsWith(prefix.toLowerCase())
 }
 
 export function getDictionarySize(): number {
-  return dictionary.size
+  // This is an approximation since we don't store the full word list after loading
+  return 172000 // Approximate size of the ENABLE dictionary
 }
 
 export function isDictionaryLoaded(): boolean {

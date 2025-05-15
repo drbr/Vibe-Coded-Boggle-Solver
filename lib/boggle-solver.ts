@@ -1,4 +1,4 @@
-import { isValidWord } from "./dictionary"
+import { isValidWord, hasWordWithPrefix } from "./dictionary"
 
 // Define directions for traversal (horizontal, vertical, diagonal)
 const directions = [
@@ -14,6 +14,8 @@ const directions = [
 
 // Find all valid words on the board using the dictionary
 export function findAllWords(board: string[][]): { word: string; path: number[][] }[] {
+  console.time("Finding words")
+
   const rows = board.length
   const cols = board[0].length
   const results: { word: string; path: number[][] }[] = []
@@ -28,6 +30,9 @@ export function findAllWords(board: string[][]): { word: string; path: number[][
     }
   }
 
+  console.timeEnd("Finding words")
+  console.log(`Found ${results.length} words`)
+
   return results
 }
 
@@ -40,7 +45,7 @@ function dfs(
   currentPath: number[][],
   visited: boolean[][],
   results: { word: string; path: number[][] }[],
-) {
+): void {
   // Check boundaries
   if (row < 0 || row >= board.length || col < 0 || col >= board[0].length || visited[row][col]) {
     return
@@ -49,6 +54,11 @@ function dfs(
   // Add current letter to the word
   const newWord = currentWord + board[row][col]
   const newPath = [...currentPath, [row, col]]
+
+  // Early termination: if no word in the dictionary starts with this prefix, stop exploring this path
+  if (!hasWordWithPrefix(newWord)) {
+    return
+  }
 
   // Mark as visited
   visited[row][col] = true

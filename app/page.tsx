@@ -18,18 +18,23 @@ export default function Home() {
   const [selectedPath, setSelectedPath] = useState<number[][]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [gameLoading, setGameLoading] = useState(false)
+  const [loadingMessage, setLoadingMessage] = useState("Loading...")
   const [dictionarySize, setDictionarySize] = useState(0)
   const [boardMode, setBoardMode] = useState<BoardMode>("boggle")
 
   useEffect(() => {
     const initializeGame = async () => {
       setIsLoading(true)
+      setLoadingMessage("Loading dictionary...")
       try {
         // Load the dictionary first
+        console.log("Loading dictionary...")
         await loadDictionary()
         setDictionarySize(getDictionarySize())
 
         // Then start a new game
+        setLoadingMessage("Generating initial game...")
+        console.log("Generating initial game...")
         await generateNewGame(boardMode)
       } catch (error) {
         console.error("Failed to initialize game:", error)
@@ -42,10 +47,12 @@ export default function Home() {
   }, [])
 
   const generateNewGame = async (mode: BoardMode) => {
+    console.log(`Generating new game with mode: ${mode}`)
     setGameLoading(true)
 
     try {
       if (!isDictionaryLoaded()) {
+        setLoadingMessage("Loading dictionary...")
         await loadDictionary()
       }
 
@@ -55,9 +62,15 @@ export default function Home() {
       }
 
       // Generate a new board using either real Boggle dice or random letters
+      setLoadingMessage("Generating board...")
+      console.time("Board generation")
       const newBoard = mode === "boggle" ? generateBoggleDiceBoard(4, 4) : generateRandomBoard(4, 4)
+      console.timeEnd("Board generation")
       setBoard(newBoard)
 
+      // Find all words on the board
+      setLoadingMessage("Finding words...")
+      console.log("Finding words on the board...")
       const foundWords = findAllWords(newBoard)
       setWords(foundWords)
       setSelectedWord(null)
@@ -66,6 +79,7 @@ export default function Home() {
       return foundWords
     } catch (error) {
       console.error("Error generating new game:", error)
+      throw error
     } finally {
       setGameLoading(false)
     }
@@ -80,7 +94,7 @@ export default function Home() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Loading Dictionary...</h2>
+          <h2 className="text-2xl font-bold mb-4">{loadingMessage}</h2>
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       </div>
@@ -97,7 +111,12 @@ export default function Home() {
 
         <div className="flex flex-col md:flex-row w-full max-w-4xl gap-8">
           <div className="w-full md:w-1/2">
-            <BoggleBoard board={board} selectedPath={selectedPath} loading={gameLoading} />
+            <BoggleBoard
+              board={board}
+              selectedPath={selectedPath}
+              loading={gameLoading}
+              loadingMessage={loadingMessage}
+            />
 
             <div className="mt-4">
               <NewGameDialog onNewGame={generateNewGame} isLoading={gameLoading} currentMode={boardMode} />
