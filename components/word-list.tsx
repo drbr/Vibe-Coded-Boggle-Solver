@@ -27,7 +27,7 @@ export default function WordList({ words, selectedWord, onWordClick }: WordListP
 
   if (words.length === 0) {
     return (
-      <div className="h-full overflow-hidden flex flex-col">
+      <div className="flex flex-col">
         <h2 className="boggle-subtitle text-xl font-semibold mb-2">FOUND WORDS: 0</h2>
         <div className="word-list p-4 h-full flex items-center justify-center">
           <p className="text-muted-foreground text-center">No words found on this board. Try generating a new board.</p>
@@ -37,10 +37,12 @@ export default function WordList({ words, selectedWord, onWordClick }: WordListP
   }
 
   return (
-    <div className="h-full overflow-hidden flex flex-col">
-      <h2 className="boggle-subtitle text-xl font-semibold mb-2">FOUND WORDS: {words.length}</h2>
+    <div className="flex flex-col">
+      <h2 className="boggle-subtitle text-xl font-semibold mb-2 sticky top-0 bg-[#f9f5eb] z-10 py-2">
+        FOUND WORDS: {words.length}
+      </h2>
 
-      <div className="word-list overflow-y-auto p-4 h-full">
+      <div className="word-list p-4">
         {sortedLengths.map((length) => (
           <div key={length} className="mb-4">
             <h3 className="boggle-subtitle text-md font-medium text-muted-foreground mb-2">

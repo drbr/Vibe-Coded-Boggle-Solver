@@ -52,6 +52,7 @@
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   padding: 12px;
+  position: relative;
 }
 
 .boggle-dice {
@@ -74,12 +75,30 @@
   background-color: #d95c35;
   border-color: #b84a2a;
   color: white;
+  z-index: 15; /* Ensure selected dice are above regular dice but below the lines */
+}
+
+.boggle-dice.first-in-path {
+  background-color: #f0b429; /* Gold/yellow color for first letter */
+  border-color: #d69e2e;
+  color: #744210; /* Darker text for better contrast */
+  box-shadow: 0 0 12px rgba(240, 180, 41, 0.6); /* Enhanced glow */
+  z-index: 16; /* Slightly higher than other selected tiles */
 }
 
 .boggle-dice .path-number {
   background-color: #2c7c54;
   color: white;
   font-weight: 600;
+  font-size: 0.7rem;
+  width: 18px;
+  height: 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.boggle-dice.first-in-path .path-number {
+  background-color: #744210; /* Darker background for first tile number */
+  color: #f0b429; /* Gold text color */
 }
 
 .word-list {
@@ -118,4 +137,17 @@
 .boggle-subtitle {
   font-family: var(--font-montserrat), sans-serif;
   font-weight: 600;
+}
+
+@media (min-width: 768px) {
+  html,
+  body {
+    height: 100%;
+    overflow-x: hidden;
+  }
+
+  main {
+    min-height: 100vh;
+    padding-bottom: 2rem;
+  }
 }

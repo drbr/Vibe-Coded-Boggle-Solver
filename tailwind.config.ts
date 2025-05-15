@@ -32,6 +32,8 @@ const config: Config = {
           dice: "#f5f1e6",
           accent: "#d95c35",
           secondary: "#2c7c54",
+          path: "#4a6fa5",
+          firstTile: "#f0b429", // Changed to gold/yellow
         },
         primary: {
           DEFAULT: "hsl(var(--primary))",

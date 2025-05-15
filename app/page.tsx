@@ -86,8 +86,34 @@ export default function Home() {
   }
 
   const handleWordClick = (word: string, path: number[][]) => {
+    // Verify that the path matches the word
+    const verifiedPath = verifyWordPath(word, path, board)
     setSelectedWord(word)
-    setSelectedPath(path)
+    setSelectedPath(verifiedPath)
+  }
+
+  // Function to verify and fix the path if needed
+  const verifyWordPath = (word: string, path: number[][], board: string[][]) => {
+    // Check if the path matches the word
+    const pathWord = path.map(([row, col]) => board[row][col]).join("")
+
+    // If the path already spells the word correctly, return it as is
+    if (pathWord === word) {
+      return path
+    }
+
+    // If the path spells the word in reverse, reverse the path
+    if (pathWord.split("").reverse().join("") === word) {
+      return [...path].reverse()
+    }
+
+    // Otherwise, we need to reconstruct the path
+    // This is a fallback and shouldn't normally be needed
+    console.warn("Path does not match word, attempting to reconstruct")
+
+    // For now, just return the original path
+    // In a real implementation, we would need to reconstruct the path
+    return path
   }
 
   if (isLoading) {
@@ -110,10 +136,11 @@ export default function Home() {
         </p>
 
         <div className="flex flex-col md:flex-row w-full max-w-4xl gap-8">
-          <div className="w-full md:w-1/2">
+          <div className="w-full md:w-1/2 md:sticky md:top-8 md:self-start">
             <BoggleBoard
               board={board}
               selectedPath={selectedPath}
+              selectedWord={selectedWord}
               loading={gameLoading}
               loadingMessage={loadingMessage}
             />
@@ -129,7 +156,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="w-full md:w-1/2">
+          <div className="w-full md:w-1/2 md:max-h-[calc(100vh-8rem)] md:overflow-y-auto">
             <WordList words={words} selectedWord={selectedWord} onWordClick={handleWordClick} />
           </div>
         </div>
