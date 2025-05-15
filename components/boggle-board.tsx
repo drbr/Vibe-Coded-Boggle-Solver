@@ -1,0 +1,45 @@
+import { cn } from "@/lib/utils"
+
+interface BoggleBoardProps {
+  board: string[][]
+  selectedPath: number[][]
+}
+
+export default function BoggleBoard({ board, selectedPath }: BoggleBoardProps) {
+  const isInPath = (row: number, col: number) => {
+    return selectedPath.some(([r, c]) => r === row && c === col)
+  }
+
+  const getPathIndex = (row: number, col: number) => {
+    return selectedPath.findIndex(([r, c]) => r === row && c === col)
+  }
+
+  if (!board.length) return <div>Loading...</div>
+
+  return (
+    <div className="grid grid-cols-4 gap-2 aspect-square w-full max-w-md mx-auto">
+      {board.map((row, rowIndex) =>
+        row.map((letter, colIndex) => (
+          <div
+            key={`${rowIndex}-${colIndex}`}
+            className={cn(
+              "flex items-center justify-center rounded-lg text-2xl font-bold aspect-square border-2",
+              isInPath(rowIndex, colIndex)
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card text-card-foreground border-border",
+            )}
+          >
+            <div className="relative">
+              {letter.toUpperCase()}
+              {isInPath(rowIndex, colIndex) && (
+                <span className="absolute -top-3 -right-3 bg-secondary text-secondary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {getPathIndex(rowIndex, colIndex) + 1}
+                </span>
+              )}
+            </div>
+          </div>
+        )),
+      )}
+    </div>
+  )
+}
