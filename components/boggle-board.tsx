@@ -24,10 +24,6 @@ export default function BoggleBoard({
     return selectedPath.length > 0 && selectedPath[0][0] === row && selectedPath[0][1] === col
   }
 
-  const getPathIndex = (row: number, col: number) => {
-    return selectedPath.findIndex(([r, c]) => r === row && c === col)
-  }
-
   if (!board.length) return <div>Loading...</div>
 
   return (
@@ -46,12 +42,6 @@ export default function BoggleBoard({
             )}
           >
             {letter.toUpperCase()}
-
-            {isInPath(rowIndex, colIndex) && (
-              <span className="path-number absolute top-1 right-1 text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                {getPathIndex(rowIndex, colIndex) + 1}
-              </span>
-            )}
           </div>
         )),
       )}
