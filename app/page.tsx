@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import BoggleBoard from "@/components/boggle-board"
 import WordList from "@/components/word-list"
 import { findAllWords } from "@/lib/boggle-solver"
@@ -8,6 +8,8 @@ import { generateRandomBoard, generateBoggleDiceBoard } from "@/lib/board-genera
 import { loadDictionary, isDictionaryLoaded, getDictionarySize } from "@/lib/dictionary"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { NewGameDialog } from "@/components/new-game-dialog"
+import { Button } from "@/components/ui/button"
+import { Edit, Check } from "lucide-react"
 
 type BoardMode = "boggle" | "random"
 
@@ -21,6 +23,8 @@ export default function Home() {
   const [loadingMessage, setLoadingMessage] = useState("Loading...")
   const [dictionarySize, setDictionarySize] = useState(0)
   const [boardMode, setBoardMode] = useState<BoardMode>("boggle")
+  const [isEditing, setIsEditing] = useState(false)
+  const boggleBoardRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const initializeGame = async () => {
@@ -112,6 +116,35 @@ export default function Home() {
     setSelectedPath(verifiedPath)
   }
 
+  const handleStartEdit = () => {
+    setIsEditing(true)
+  }
+
+  const handleSaveEdit = (newBoard: string[][]) => {
+    setIsEditing(false)
+    handleBoardChange(newBoard)
+  }
+
+  const handleEditButtonClick = () => {
+    if (isEditing) {
+      // When saving, get the current edit state from the window object
+      // @ts-ignore - Accessing custom property
+      const currentEditBoard = window.boggleBoardEditState
+      if (currentEditBoard) {
+        // Validate the board (replace empty cells with 'e')
+        const validBoard = currentEditBoard.map((row: string[]) =>
+          row.map((cell: string) => (cell.trim() === "" ? "e" : cell)),
+        )
+        handleSaveEdit(validBoard)
+      } else {
+        // Fallback if we can't get the edit state
+        setIsEditing(false)
+      }
+    } else {
+      handleStartEdit()
+    }
+  }
+
   // Function to verify and fix the path if needed
   const verifyWordPath = (word: string, path: number[][], board: string[][]) => {
     // Check if the path matches the word
@@ -157,14 +190,39 @@ export default function Home() {
 
         <div className="flex flex-col md:flex-row w-full max-w-4xl gap-8">
           <div className="w-full md:w-1/2 md:sticky md:top-8 md:self-start">
-            <BoggleBoard
-              board={board}
-              selectedPath={selectedPath}
-              selectedWord={selectedWord}
-              loading={gameLoading}
-              loadingMessage={loadingMessage}
-              onBoardChange={handleBoardChange}
-            />
+            <div ref={boggleBoardRef}>
+              <BoggleBoard
+                board={board}
+                selectedPath={selectedPath}
+                selectedWord={selectedWord}
+                loading={gameLoading}
+                loadingMessage={loadingMessage}
+                onBoardChange={handleBoardChange}
+                onStartEdit={handleStartEdit}
+                onSaveEdit={handleSaveEdit}
+                isEditing={isEditing}
+              />
+            </div>
+
+            <div className="mt-4">
+              <Button
+                className="w-full bg-boggle-secondary hover:bg-boggle-secondary/90 font-semibold"
+                onClick={handleEditButtonClick}
+                disabled={gameLoading}
+              >
+                {isEditing ? (
+                  <>
+                    <Check className="h-4 w-4 mr-2" />
+                    SAVE LETTERS
+                  </>
+                ) : (
+                  <>
+                    <Edit className="h-4 w-4 mr-2" />
+                    EDIT LETTERS
+                  </>
+                )}
+              </Button>
+            </div>
 
             <div className="mt-4">
               <NewGameDialog

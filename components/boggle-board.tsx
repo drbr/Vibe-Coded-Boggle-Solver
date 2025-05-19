@@ -5,8 +5,6 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import PathOverlay from "./path-overlay"
-import { Button } from "@/components/ui/button"
-import { Edit, Check } from "lucide-react"
 
 interface BoggleBoardProps {
   board: string[][]
@@ -15,6 +13,9 @@ interface BoggleBoardProps {
   loading?: boolean
   loadingMessage?: string
   onBoardChange?: (newBoard: string[][]) => void
+  onStartEdit?: () => void
+  onSaveEdit?: (board: string[][]) => void
+  isEditing?: boolean
 }
 
 export default function BoggleBoard({
@@ -24,6 +25,9 @@ export default function BoggleBoard({
   loading = false,
   loadingMessage = "Finding words...",
   onBoardChange,
+  onStartEdit,
+  onSaveEdit,
+  isEditing,
 }: BoggleBoardProps) {
   const [editMode, setEditMode] = useState(false)
   const [editBoard, setEditBoard] = useState<string[][]>(board)
@@ -33,6 +37,7 @@ export default function BoggleBoard({
       .fill(null)
       .map(() => Array(board[0]?.length || 0).fill(null)),
   )
+  const prevEditingRef = useRef(isEditing)
 
   // Update editBoard when board changes (from parent)
   useEffect(() => {
@@ -75,6 +80,24 @@ export default function BoggleBoard({
     }
   }
 
+  // Get the next cell position (left-to-right, then top-to-bottom)
+  const getNextCellPosition = (rowIndex: number, colIndex: number): [number, number] => {
+    const rows = board.length
+    const cols = board[0]?.length || 0
+
+    // Move to the next column
+    let nextCol = colIndex + 1
+    let nextRow = rowIndex
+
+    // If we're at the end of a row, move to the next row
+    if (nextCol >= cols) {
+      nextCol = 0
+      nextRow = (nextRow + 1) % rows
+    }
+
+    return [nextRow, nextCol]
+  }
+
   // Focus the input at the specified position
   useEffect(() => {
     if (focusPosition && editMode) {
@@ -89,6 +112,12 @@ export default function BoggleBoard({
 
     const newBoard = editBoard.map((row, r) => row.map((cell, c) => (r === rowIndex && c === colIndex ? letter : cell)))
     setEditBoard(newBoard)
+
+    // If a letter was entered (not deleted), advance to the next cell
+    if (letter) {
+      const nextPosition = getNextCellPosition(rowIndex, colIndex)
+      setFocusPosition(nextPosition)
+    }
   }
 
   const handleSaveChanges = () => {
@@ -96,8 +125,8 @@ export default function BoggleBoard({
     const validBoard = editBoard.map((row) => row.map((cell) => (cell.trim() === "" ? "e" : cell)))
 
     setEditMode(false)
-    if (onBoardChange) {
-      onBoardChange(validBoard)
+    if (onSaveEdit) {
+      onSaveEdit(validBoard)
     }
   }
 
@@ -108,6 +137,41 @@ export default function BoggleBoard({
   const isFirstInPath = (row: number, col: number) => {
     return selectedPath.length > 0 && selectedPath[0][0] === row && selectedPath[0][1] === col
   }
+
+  // Handle edit mode changes from parent
+  useEffect(() => {
+    if (isEditing !== undefined && isEditing !== prevEditingRef.current) {
+      setEditMode(isEditing)
+
+      // Only set focus to first cell when first entering edit mode
+      if (isEditing && !prevEditingRef.current) {
+        setFocusPosition([0, 0])
+      }
+      // Handle saving when exiting edit mode
+      else if (!isEditing && prevEditingRef.current && onSaveEdit) {
+        const validBoard = editBoard.map((row) => row.map((cell) => (cell.trim() === "" ? "e" : cell)))
+        onSaveEdit(validBoard)
+      }
+
+      prevEditingRef.current = isEditing
+    }
+  }, [isEditing, onSaveEdit])
+
+  // Expose a method to get the current edit board
+  useEffect(() => {
+    // Add the getEditBoard method to the component instance
+    if (typeof window !== "undefined") {
+      // @ts-ignore - Adding a custom property to the component instance
+      window.boggleBoardEditState = editBoard
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        // @ts-ignore - Cleaning up
+        delete window.boggleBoardEditState
+      }
+    }
+  }, [editBoard])
 
   if (!board.length) return <div>Loading...</div>
 
@@ -158,29 +222,6 @@ export default function BoggleBoard({
           </div>
         )}
       </div>
-
-      {/* Edit mode toggle button */}
-      <Button
-        variant="outline"
-        size="sm"
-        className={cn(
-          "absolute top-2 right-2 z-20",
-          editMode ? "bg-boggle-accent text-white hover:bg-boggle-accent/90" : "",
-        )}
-        onClick={() => {
-          if (editMode) {
-            handleSaveChanges()
-          } else {
-            setEditMode(true)
-            // Focus the first cell when entering edit mode
-            setFocusPosition([0, 0])
-          }
-        }}
-        disabled={loading}
-      >
-        {editMode ? <Check className="h-4 w-4 mr-1" /> : <Edit className="h-4 w-4 mr-1" />}
-        {editMode ? "Save" : "Edit Letters"}
-      </Button>
     </div>
   )
 }
