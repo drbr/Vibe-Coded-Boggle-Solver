@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import {
@@ -24,8 +24,15 @@ interface NewGameDialogProps {
 
 export function NewGameDialog({ onNewGame, isLoading, currentMode }: NewGameDialogProps) {
   const [open, setOpen] = useState(false)
-  const [selectedMode, setSelectedMode] = useState<BoardMode>(currentMode)
   const [dialogLoading, setDialogLoading] = useState(false)
+  const [selectedMode, setSelectedMode] = useState<BoardMode>(currentMode)
+
+  useEffect(() => {
+    // Reset dialog state when component mounts or when loading states change
+    if (isLoading || dialogLoading) {
+      setOpen(false)
+    }
+  }, [isLoading, dialogLoading])
 
   const handleGenerate = async () => {
     try {
@@ -43,7 +50,11 @@ export function NewGameDialog({ onNewGame, isLoading, currentMode }: NewGameDial
     <Dialog
       open={open}
       onOpenChange={(newOpen) => {
-        if (isLoading || dialogLoading) return // Prevent closing during loading
+        if (isLoading || dialogLoading) {
+          // Only allow closing, not opening during loading
+          if (!newOpen) setOpen(false)
+          return
+        }
         setOpen(newOpen)
       }}
     >
@@ -62,7 +73,7 @@ export function NewGameDialog({ onNewGame, isLoading, currentMode }: NewGameDial
           )}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] bg-[#f9f5eb] border-[#d9c9a3]">
+      <DialogContent className="sm:max-w-[425px] bg-[#f9f5eb] border-[#d9c9a3] z-[100]">
         <DialogHeader>
           <DialogTitle className="text-boggle-accent font-bold uppercase">Generate New Game</DialogTitle>
           <DialogDescription>Choose how you want to generate the Boggle board.</DialogDescription>

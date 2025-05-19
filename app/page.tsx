@@ -85,6 +85,26 @@ export default function Home() {
     }
   }
 
+  const handleBoardChange = async (newBoard: string[][]) => {
+    setGameLoading(true)
+    setLoadingMessage("Finding words...")
+
+    try {
+      // Update the board
+      setBoard(newBoard)
+
+      // Find all words on the new board
+      const foundWords = findAllWords(newBoard)
+      setWords(foundWords)
+      setSelectedWord(null)
+      setSelectedPath([])
+    } catch (error) {
+      console.error("Error updating board:", error)
+    } finally {
+      setGameLoading(false)
+    }
+  }
+
   const handleWordClick = (word: string, path: number[][]) => {
     // Verify that the path matches the word
     const verifiedPath = verifyWordPath(word, path, board)
@@ -143,15 +163,25 @@ export default function Home() {
               selectedWord={selectedWord}
               loading={gameLoading}
               loadingMessage={loadingMessage}
+              onBoardChange={handleBoardChange}
             />
 
             <div className="mt-4">
-              <NewGameDialog onNewGame={generateNewGame} isLoading={gameLoading} currentMode={boardMode} />
+              <NewGameDialog
+                key={`dialog-${gameLoading}`}
+                onNewGame={generateNewGame}
+                isLoading={gameLoading}
+                currentMode={boardMode}
+              />
             </div>
 
             <div className="mt-4 text-sm text-muted-foreground">
               <p>
                 <strong>Current mode:</strong> {boardMode === "boggle" ? "Authentic Boggle Dice" : "Random Letters"}
+              </p>
+              <p className="mt-1">
+                <strong>Tip:</strong> Click "Edit Letters" to customize the board. Use arrow keys to navigate and Enter
+                to save.
               </p>
             </div>
           </div>

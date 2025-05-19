@@ -95,6 +95,21 @@
   z-index: 16; /* Slightly higher than other selected tiles */
 }
 
+/* Edit mode styles */
+.boggle-dice.edit-mode {
+  background: linear-gradient(145deg, #f9f5eb, #f0e6d2);
+  border: 1px dashed #d9c9a3;
+  cursor: text;
+  transition: all 0.2s ease;
+}
+
+.boggle-dice.edit-mode:hover,
+.boggle-dice.edit-mode:focus-within {
+  background: linear-gradient(145deg, #ffffff, #f9f5eb);
+  border-color: #d95c35;
+  box-shadow: 0 0 0 2px rgba(217, 92, 53, 0.2);
+}
+
 .word-list {
   border: 2px solid #d9c9a3;
   border-radius: 8px;
