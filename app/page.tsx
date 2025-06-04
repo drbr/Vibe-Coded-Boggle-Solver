@@ -6,7 +6,6 @@ import WordList from "@/components/word-list"
 import { findAllWords } from "@/lib/boggle-solver"
 import { generateRandomBoard, generateBoggleDiceBoard } from "@/lib/board-generator"
 import { loadDictionary, isDictionaryLoaded, getDictionarySize } from "@/lib/dictionary"
-import { TooltipProvider } from "@/components/ui/tooltip"
 import { NewGameDialog } from "@/components/new-game-dialog"
 import { Button } from "@/components/ui/button"
 import { Edit, Check } from "lucide-react"
@@ -181,7 +180,6 @@ export default function Home() {
   }
 
   return (
-    <TooltipProvider>
       <main className="flex min-h-screen flex-col items-center p-4 md:p-8 bg-[#f9f5eb]">
         <h1 className="boggle-title text-4xl font-bold mb-2">BOGGLE SOLVER</h1>
         <p className="text-muted-foreground mb-6">
@@ -249,6 +247,5 @@ export default function Home() {
           </div>
         </div>
       </main>
-    </TooltipProvider>
   )
 }
