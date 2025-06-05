@@ -1,7 +1,6 @@
 import { findAllWords } from '@/lib/boggle-solver';
 import { Trie } from '@/lib/trie';
 import { withTiming } from '@/lib/utils';
-import { verifyWordPath } from '@/lib/verifyWordPath';
 import { Check, Edit } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import BoggleBoard from './boggle-board';
@@ -47,10 +46,8 @@ export function LoadedGame(props: LoadedGameProps) {
 
   // TODO: Change this arg type to FoundWord
   const handleWordClick = (word: string, path: number[][]) => {
-    // Verify that the path matches the word
-    const verifiedPath = verifyWordPath(word, path, board);
     setSelectedWord(word);
-    setSelectedPath(verifiedPath);
+    setSelectedPath(path);
   };
 
   const [isEditing, setIsEditing] = useState(false);
