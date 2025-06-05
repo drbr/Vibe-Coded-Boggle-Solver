@@ -1,11 +1,12 @@
 'use client';
 
+import { FoundWord } from '@/lib/BoardTypes';
 import { cn } from '@/lib/utils';
 
 interface WordListProps {
   words: { word: string; path: number[][] }[];
   selectedWord: string | null;
-  onWordClick: (word: string, path: number[][]) => void;
+  onWordClick: (foundWord: FoundWord) => void;
 }
 
 export default function WordList({
@@ -57,7 +58,7 @@ export default function WordList({
               {wordsByLength[length].map(({ word, path }) => (
                 <button
                   key={word}
-                  onClick={() => onWordClick(word, path)}
+                  onClick={() => onWordClick({ word, path })}
                   className={cn(
                     'word-item px-3 py-1.5 text-left',
                     selectedWord === word ? 'selected' : ''

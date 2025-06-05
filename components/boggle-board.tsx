@@ -8,8 +8,7 @@ import PathOverlay from './path-overlay';
 
 interface BoggleBoardProps {
   board: string[][];
-  selectedPath: number[][];
-  selectedWord: string | null;
+  selectedWordAndPath: { word: string; path: number[][] } | null;
   loading?: boolean;
   loadingMessage?: string;
   onSaveEdit?: (board: string[][]) => void;
@@ -18,8 +17,7 @@ interface BoggleBoardProps {
 
 export default function BoggleBoard({
   board,
-  selectedPath,
-  selectedWord,
+  selectedWordAndPath,
   loading = false,
   loadingMessage = 'Finding words...',
   onSaveEdit,
@@ -144,15 +142,12 @@ export default function BoggleBoard({
   };
 
   const isInPath = (row: number, col: number) => {
-    return selectedPath.some(([r, c]) => r === row && c === col);
+    return selectedWordAndPath?.path.some(([r, c]) => r === row && c === col);
   };
 
   const isFirstInPath = (row: number, col: number) => {
-    return (
-      selectedPath.length > 0 &&
-      selectedPath[0][0] === row &&
-      selectedPath[0][1] === col
-    );
+    const path = selectedWordAndPath?.path ?? [];
+    return path.length > 0 && path[0][0] === row && path[0][1] === col;
   };
 
   // Handle edit mode changes from parent
@@ -200,9 +195,9 @@ export default function BoggleBoard({
         {/* Path overlay for drawing lines between cells */}
         {!editMode && (
           <PathOverlay
-            selectedPath={selectedPath}
+            selectedPath={selectedWordAndPath?.path ?? []}
             boardSize={board.length}
-            word={selectedWord}
+            word={selectedWordAndPath?.word ?? ''}
             board={board}
           />
         )}

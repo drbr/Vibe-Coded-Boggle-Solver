@@ -27,27 +27,22 @@ export function LoadedGame(props: LoadedGameProps) {
     return findAllWordsOnBoard(board, dictionary);
   }, [board, dictionary]);
 
-  const [selectedWord, setSelectedWord] = useState<string | null>(null);
-  const [selectedPath, setSelectedPath] = useState<number[][]>([]);
+  const [selectedWordAndPath, setSelectedWordAndPath] = useState<{
+    word: string;
+    path: number[][];
+  } | null>(null);
 
   // Whenever the words updates, the selection state needs to be cleared.
   // This relationship could be codified even more by putting the selection state
   // in a subcomponent and rendering it with a new key every time the word list changes
   // (perhaps represented by the concatenation of letters in the board).
   useEffect(() => {
-    if (foundWords.length > 0) {
-      setSelectedWord(foundWords[0].word);
-      setSelectedPath(foundWords[0].path);
-    } else {
-      setSelectedWord(null);
-      setSelectedPath([]);
-    }
+    const first = foundWords[0] ?? null;
+    setSelectedWordAndPath(first);
   }, [foundWords]);
 
-  // TODO: Change this arg type to FoundWord
-  const handleWordClick = (word: string, path: number[][]) => {
-    setSelectedWord(word);
-    setSelectedPath(path);
+  const handleWordClick = (foundWord: FoundWord) => {
+    setSelectedWordAndPath(foundWord);
   };
 
   const [isEditing, setIsEditing] = useState(false);
@@ -88,8 +83,7 @@ export function LoadedGame(props: LoadedGameProps) {
         <div ref={boggleBoardRef}>
           <BoggleBoard
             board={board}
-            selectedPath={selectedPath}
-            selectedWord={selectedWord}
+            selectedWordAndPath={selectedWordAndPath}
             loading={false} // TODO: Maybe get rid of this prop?
             loadingMessage={''} // TODO: Maybe get rid of this prop?
             onSaveEdit={handleSaveEdit}
@@ -141,7 +135,7 @@ export function LoadedGame(props: LoadedGameProps) {
       <div className="w-full md:w-1/2 md:max-h-[calc(100vh-8rem)] md:overflow-y-auto">
         <WordList
           words={foundWords}
-          selectedWord={selectedWord}
+          selectedWord={selectedWordAndPath?.word ?? null}
           onWordClick={handleWordClick}
         />
       </div>
