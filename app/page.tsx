@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useReducer } from 'react';
 import { LoadedGame } from '@/components/LoadedGame';
 import { loadDictionary } from '@/lib/dictionary';
 import { Trie } from '@/lib/trie';
@@ -8,32 +8,84 @@ import { generateNewBoard } from '../lib/generateNewBoard';
 import { Board, BoardMode } from '@/lib/BoardTypes';
 
 type LoadingState =
-  | { type: 'loadingDictionary' }
+  | { name: 'loadingDictionary' }
   | {
-      type: 'loadedDictionary';
+      name: 'loadedDictionary';
       dictionary: Trie;
       board: Board;
       mode: BoardMode;
     }
-  | { type: 'error' };
+  | { name: 'error' };
 
-export default function Home() {
-  const [loadState, setLoadState] = useState<LoadingState>({
-    type: 'loadingDictionary',
+type LoadingAction =
+  | {
+      type: 'LOADED_DICTIONARY';
+      dictionary: Trie;
+      board: Board;
+      mode: BoardMode;
+    }
+  | { type: 'ERROR' }
+  | { type: 'UPDATE_BOARD'; board: Board; mode: BoardMode };
+
+function loadingStateReducer(
+  state: LoadingState,
+  action: LoadingAction
+): LoadingState {
+  switch (state.name) {
+    case 'loadingDictionary':
+      switch (action.type) {
+        case 'LOADED_DICTIONARY':
+          return {
+            name: 'loadedDictionary',
+            dictionary: action.dictionary,
+            board: action.board,
+            mode: action.mode,
+          };
+        case 'ERROR':
+          return {
+            name: 'error',
+          };
+        default:
+          return state;
+      }
+    case 'loadedDictionary':
+      switch (action.type) {
+        case 'UPDATE_BOARD':
+          return {
+            name: 'loadedDictionary',
+            dictionary: state.dictionary,
+            board: action.board,
+            mode: action.mode,
+          };
+        default:
+          return state;
+      }
+    case 'error':
+      return state;
+  }
+}
+
+export default function Page() {
+  const [loadState, dispatchLoadAction] = useReducer(loadingStateReducer, {
+    name: 'loadingDictionary',
   });
 
   // Load dictionary
   useEffect(() => {
     const doLoadDictionary = async () => {
-      setLoadState({ type: 'loadingDictionary' });
       try {
         const dictionary = await loadDictionary();
         const mode: BoardMode = 'boggle';
         const board = generateNewBoard(mode);
-        setLoadState({ type: 'loadedDictionary', dictionary, board, mode });
+        dispatchLoadAction({
+          type: 'LOADED_DICTIONARY',
+          dictionary,
+          board,
+          mode,
+        });
       } catch (error) {
         console.error('Failed to initialize game:', error);
-        setLoadState({ type: 'error' });
+        dispatchLoadAction({ type: 'ERROR' });
       }
     };
 
@@ -41,15 +93,10 @@ export default function Home() {
   }, []);
 
   const handleBoardChange = (newBoard: Board, mode: BoardMode) => {
-    setLoadState({
-      type: 'loadedDictionary',
-      dictionary,
-      board: newBoard,
-      mode,
-    });
+    dispatchLoadAction({ type: 'UPDATE_BOARD', board: newBoard, mode });
   };
 
-  if (loadState.type === 'loadingDictionary') {
+  if (loadState.name === 'loadingDictionary') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f9f5eb]">
         <div className="text-center">
@@ -62,7 +109,7 @@ export default function Home() {
     );
   }
 
-  if (loadState.type === 'error') {
+  if (loadState.name === 'error') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f9f5eb]">
         <div className="text-center">
