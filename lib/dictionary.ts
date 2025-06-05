@@ -2,63 +2,51 @@
 import { Trie } from './trie';
 
 // We'll use a Trie for fast lookups and prefix checking
-let dictionaryTrie: Trie | null = null;
+let dictionaryPromise: Promise<Trie> | null = null;
+
 let isLoaded = false;
 let isLoading = false;
 
-export async function loadDictionary(): Promise<void> {
-  if (isLoaded || isLoading) return;
+/**
+ * The dictionary is a singleton. This function is "memoized" in that it will
+ * invoke the async fetch the first time it's called; all subsequent calls will
+ * return the same promise as the first invocation, which resolves to the dictionary trie.
+ *
+ * In a more polished implementation, I'd separate the memoization from the actual business logic.
+ * The only difference in the code is that it wouldn't set the global variable from within the
+ * function.
+ */
+export async function loadDictionary(): Promise<Trie> {
+  if (dictionaryPromise) return dictionaryPromise;
 
-  isLoading = true;
-  console.time('Dictionary loading');
+  dictionaryPromise = new Promise(async (resolve, reject) => {
+    try {
+      // The dictionary lives in the "public" directory.
+      const response = await fetch('/dictionary_ospd.txt');
+      if (!response.ok) {
+        throw new Error(`Failed to load dictionary: ${response.status}`);
+      }
 
-  try {
-    // Fetch the dictionary from the public directory
-    const response = await fetch('/dictionary.txt');
-    if (!response.ok) {
-      throw new Error(`Failed to load dictionary: ${response.status}`);
+      const text = await response.text();
+      const words = text
+        .split('\n')
+        .map((word) => word.toLowerCase().trim())
+        .filter((word) => word.length >= 3 && word.length <= 16);
+
+      const dictionaryTrie = Trie.fromArray(words);
+      resolve(dictionaryTrie);
+    } catch (error) {
+      console.error('Error loading dictionary:', error);
+      reject(error);
     }
-
-    const text = await response.text();
-    const words = text
-      .split('\n')
-      .filter((word: string) => word.trim().length > 0)
-      .map((word: string) => word.toLowerCase().trim())
-      .filter((word: string) => word.length >= 3 && word.length <= 16);
-
-    console.log(`Building trie with ${words.length} words...`);
-    dictionaryTrie = Trie.fromArray(words);
-
-    isLoaded = true;
-    console.log(`Dictionary loaded with ${words.length} words`);
-  } catch (error) {
-    console.error('Error loading dictionary:', error);
-    throw error;
-  } finally {
-    isLoading = false;
-    console.timeEnd('Dictionary loading');
-  }
+  });
+  return dictionaryPromise;
 }
 
-export function isValidWord(word: string): boolean {
-  if (!dictionaryTrie) return false;
-  return dictionaryTrie.search(word.toLowerCase());
+export function isValidWord(word: string, trie: Trie): boolean {
+  return trie.search(word.toLowerCase());
 }
 
-export function hasWordWithPrefix(prefix: string): boolean {
-  if (!dictionaryTrie) return false;
-  return dictionaryTrie.startsWith(prefix.toLowerCase());
-}
-
-export function getDictionarySize(): number {
-  // Approximate size of the local ENABLE dictionary
-  return 172823; // Based on the actual line count of our dictionary.txt file
-}
-
-export function isDictionaryLoaded(): boolean {
-  return isLoaded;
-}
-
-export function isDictionaryLoading(): boolean {
-  return isLoading;
+export function hasWordWithPrefix(prefix: string, trie: Trie): boolean {
+  return trie.startsWith(prefix.toLowerCase());
 }
