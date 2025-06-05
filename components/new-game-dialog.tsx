@@ -13,8 +13,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-
-type BoardMode = 'boggle' | 'random';
+import { BoardMode } from '@/lib/BoardTypes';
 
 interface NewGameDialogProps {
   onNewGame: (mode: BoardMode) => void;

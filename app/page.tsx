@@ -1,14 +1,20 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { LoadedGame, Board, BoardMode } from '@/components/LoadedGame';
+import { useState, useEffect } from 'react';
+import { LoadedGame } from '@/components/LoadedGame';
 import { loadDictionary } from '@/lib/dictionary';
 import { Trie } from '@/lib/trie';
 import { generateNewBoard } from '../lib/generateNewBoard';
+import { Board, BoardMode } from '@/lib/BoardTypes';
 
 type LoadingState =
   | { type: 'loadingDictionary' }
-  | { type: 'loadedDictionary'; dictionary: Trie; board: Board }
+  | {
+      type: 'loadedDictionary';
+      dictionary: Trie;
+      board: Board;
+      mode: BoardMode;
+    }
   | { type: 'error' };
 
 export default function Home() {
@@ -16,16 +22,15 @@ export default function Home() {
     type: 'loadingDictionary',
   });
 
-  const [boardMode, setBoardMode] = useState<BoardMode>('boggle');
   // Load dictionary
   useEffect(() => {
     const doLoadDictionary = async () => {
       setLoadState({ type: 'loadingDictionary' });
       try {
-        // Load the dictionary first
         const dictionary = await loadDictionary();
-        const board = generateNewBoard(boardMode);
-        setLoadState({ type: 'loadedDictionary', dictionary, board });
+        const mode: BoardMode = 'boggle';
+        const board = generateNewBoard(mode);
+        setLoadState({ type: 'loadedDictionary', dictionary, board, mode });
       } catch (error) {
         console.error('Failed to initialize game:', error);
         setLoadState({ type: 'error' });
@@ -35,8 +40,13 @@ export default function Home() {
     doLoadDictionary();
   }, []);
 
-  const handleBoardChange = (newBoard: Board) => {
-    setLoadState({ type: 'loadedDictionary', dictionary, board: newBoard });
+  const handleBoardChange = (newBoard: Board, mode: BoardMode) => {
+    setLoadState({
+      type: 'loadedDictionary',
+      dictionary,
+      board: newBoard,
+      mode,
+    });
   };
 
   if (loadState.type === 'loadingDictionary') {
@@ -64,7 +74,7 @@ export default function Home() {
     );
   }
 
-  const { dictionary, board } = loadState;
+  const { dictionary, board, mode } = loadState;
   return (
     <main className="flex min-h-screen flex-col items-center p-4 md:p-8 bg-[#f9f5eb]">
       <h1 className="boggle-title text-4xl font-bold mb-2">BOGGLE SOLVER</h1>
@@ -73,7 +83,7 @@ export default function Home() {
         dictionary
       </p>
       <LoadedGame
-        boardMode={boardMode}
+        boardMode={mode}
         board={board}
         dictionary={dictionary}
         handleBoardChange={handleBoardChange}

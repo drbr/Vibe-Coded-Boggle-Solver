@@ -9,16 +9,13 @@ import { NewGameDialog } from './new-game-dialog';
 import { Button } from './ui/button';
 import WordList from './word-list';
 import { generateNewBoard } from '@/lib/generateNewBoard';
-
-export type BoardMode = 'boggle' | 'random';
-export type Board = string[][];
-export type FoundWord = { word: string; path: number[][] };
+import { BoardMode, Board, FoundWord } from '@/lib/BoardTypes';
 
 export type LoadedGameProps = {
   boardMode: BoardMode;
   board: Board;
   dictionary: Trie;
-  handleBoardChange: (newBoard: Board) => void;
+  handleBoardChange: (newBoard: Board, mode: BoardMode) => void;
 };
 
 export function LoadedGame(props: LoadedGameProps) {
@@ -58,13 +55,9 @@ export function LoadedGame(props: LoadedGameProps) {
 
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleStartEdit = () => {
-    setIsEditing(true);
-  };
-
   const handleSaveEdit = (newBoard: string[][]) => {
     setIsEditing(false);
-    handleBoardChange(newBoard);
+    handleBoardChange(newBoard, boardMode);
   };
 
   const handleEditButtonClick = () => {
@@ -83,13 +76,13 @@ export function LoadedGame(props: LoadedGameProps) {
         setIsEditing(false);
       }
     } else {
-      handleStartEdit();
+      setIsEditing(true);
     }
   };
 
   const onNewGame = (mode: BoardMode) => {
     const newBoard = generateNewBoard(mode);
-    handleBoardChange(newBoard);
+    handleBoardChange(newBoard, mode);
   };
 
   return (
@@ -102,8 +95,6 @@ export function LoadedGame(props: LoadedGameProps) {
             selectedWord={selectedWord}
             loading={false} // TODO: Maybe get rid of this prop?
             loadingMessage={''} // TODO: Maybe get rid of this prop?
-            onBoardChange={props.handleBoardChange}
-            onStartEdit={handleStartEdit}
             onSaveEdit={handleSaveEdit}
             isEditing={isEditing}
           />

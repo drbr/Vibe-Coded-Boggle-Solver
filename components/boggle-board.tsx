@@ -12,8 +12,6 @@ interface BoggleBoardProps {
   selectedWord: string | null;
   loading?: boolean;
   loadingMessage?: string;
-  onBoardChange?: (newBoard: string[][]) => void;
-  onStartEdit?: () => void;
   onSaveEdit?: (board: string[][]) => void;
   isEditing?: boolean;
 }
@@ -24,8 +22,6 @@ export default function BoggleBoard({
   selectedWord,
   loading = false,
   loadingMessage = 'Finding words...',
-  onBoardChange,
-  onStartEdit,
   onSaveEdit,
   isEditing,
 }: BoggleBoardProps) {
