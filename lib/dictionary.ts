@@ -1,11 +1,8 @@
 // Dictionary management and loading
 import { Trie } from './trie';
 
-// We'll use a Trie for fast lookups and prefix checking
+// We'll represent the dictionary as a Trie for fast lookups and prefix checking
 let dictionaryPromise: Promise<Trie> | null = null;
-
-let isLoaded = false;
-let isLoading = false;
 
 /**
  * The dictionary is a singleton. This function is "memoized" in that it will
@@ -33,7 +30,7 @@ export async function loadDictionary(): Promise<Trie> {
         .map((word) => word.toLowerCase().trim())
         .filter((word) => word.length >= 3 && word.length <= 16);
 
-      const dictionaryTrie = Trie.fromArray(words);
+      const dictionaryTrie = new Trie(words);
       resolve(dictionaryTrie);
     } catch (error) {
       console.error('Error loading dictionary:', error);
@@ -41,12 +38,4 @@ export async function loadDictionary(): Promise<Trie> {
     }
   });
   return dictionaryPromise;
-}
-
-export function isValidWord(word: string, trie: Trie): boolean {
-  return trie.search(word.toLowerCase());
-}
-
-export function hasWordWithPrefix(prefix: string, trie: Trie): boolean {
-  return trie.startsWith(prefix.toLowerCase());
 }

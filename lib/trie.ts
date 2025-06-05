@@ -3,13 +3,23 @@
  */
 export class Trie {
   private root: TrieNode;
+  private size_: number;
 
-  constructor() {
+  /**
+   * Construct a trie from an array of words. If we want the trie to be case-insensitive, then
+   * the words should already be normalized (e.g. converted to lowercase).
+   */
+  public constructor(words: string[]) {
     this.root = new TrieNode();
+    this.size_ = words.length;
+
+    for (const word of words) {
+      this.insert(word);
+    }
   }
 
-  // Insert a word into the trie
-  insert(word: string): void {
+  /** Inserts a word into the trie */
+  private insert(word: string): void {
     let node = this.root;
     for (const char of word.toLowerCase()) {
       if (!node.children.has(char)) {
@@ -20,18 +30,22 @@ export class Trie {
     node.isEndOfWord = true;
   }
 
-  // Check if a word exists in the trie
-  search(word: string): boolean {
+  public get size(): number {
+    return this.size_;
+  }
+
+  /** Check if a word exists in the trie */
+  public search(word: string): boolean {
     const node = this.findNode(word);
     return node !== null && node.isEndOfWord;
   }
 
-  // Check if any word in the trie starts with the given prefix
-  startsWith(prefix: string): boolean {
+  /** Check if any word in the trie starts with the given prefix */
+  public startsWith(prefix: string): boolean {
     return this.findNode(prefix) !== null;
   }
 
-  // Find the node that corresponds to the last character of the word/prefix
+  /** Find the node that corresponds to the last character of the word/prefix */
   private findNode(str: string): TrieNode | null {
     let node = this.root;
     for (const char of str.toLowerCase()) {
@@ -41,15 +55,6 @@ export class Trie {
       node = node.children.get(char)!;
     }
     return node;
-  }
-
-  // Build a trie from an array of words
-  static fromArray(words: string[]): Trie {
-    const trie = new Trie();
-    for (const word of words) {
-      trie.insert(word);
-    }
-    return trie;
   }
 }
 

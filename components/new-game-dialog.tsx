@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 type BoardMode = 'boggle' | 'random';
 
 interface NewGameDialogProps {
-  onNewGame: (mode: BoardMode) => Promise<void>;
+  onNewGame: (mode: BoardMode) => void;
   isLoading: boolean;
   currentMode: BoardMode;
 }

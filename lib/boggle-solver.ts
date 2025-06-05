@@ -1,4 +1,12 @@
-import { isValidWord, hasWordWithPrefix } from './dictionary';
+import { Trie } from './trie';
+
+function isValidWord(word: string, dictionary: Trie): boolean {
+  return dictionary.search(word.toLowerCase());
+}
+
+function hasWordWithPrefix(prefix: string, dictionary: Trie): boolean {
+  return dictionary.startsWith(prefix.toLowerCase());
+}
 
 // Define directions for traversal (horizontal, vertical, diagonal)
 const directions = [
@@ -14,7 +22,8 @@ const directions = [
 
 // Find all valid words on the board using the dictionary
 export function findAllWords(
-  board: string[][]
+  board: string[][],
+  dictionary: Trie
 ): { word: string; path: number[][] }[] {
   console.time('Finding words');
 
@@ -28,7 +37,7 @@ export function findAllWords(
   // Generate words starting from each cell
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
-      dfs(board, i, j, '', [], visited, results);
+      dfs(dictionary, board, i, j, '', [], visited, results);
     }
   }
 
@@ -40,6 +49,7 @@ export function findAllWords(
 
 // Depth-first search to find all possible words
 function dfs(
+  dictionary: Trie,
   board: string[][],
   row: number,
   col: number,
@@ -64,7 +74,7 @@ function dfs(
   const newPath = [...currentPath, [row, col]];
 
   // Early termination: if no word in the dictionary starts with this prefix, stop exploring this path
-  if (!hasWordWithPrefix(newWord)) {
+  if (!hasWordWithPrefix(newWord, dictionary)) {
     return;
   }
 
@@ -72,7 +82,7 @@ function dfs(
   visited[row][col] = true;
 
   // If word is valid according to the dictionary, add it to results
-  if (newWord.length >= 3 && isValidWord(newWord)) {
+  if (newWord.length >= 3 && isValidWord(newWord, dictionary)) {
     // Avoid duplicates
     if (!results.some((item) => item.word === newWord)) {
       results.push({ word: newWord, path: newPath });
@@ -81,7 +91,16 @@ function dfs(
 
   // Continue searching in all directions
   for (const [dx, dy] of directions) {
-    dfs(board, row + dx, col + dy, newWord, newPath, visited, results);
+    dfs(
+      dictionary,
+      board,
+      row + dx,
+      col + dy,
+      newWord,
+      newPath,
+      visited,
+      results
+    );
   }
 
   // Backtrack
