@@ -1,34 +1,39 @@
 interface PathOverlayProps {
-  selectedPath: number[][]
-  boardSize: number
-  word: string | null
-  board: string[][]
+  selectedPath: number[][];
+  boardSize: number;
+  word: string | null;
+  board: string[][];
 }
 
-export default function PathOverlay({ selectedPath, boardSize, word, board }: PathOverlayProps) {
-  if (!selectedPath.length || !word) return null
+export default function PathOverlay({
+  selectedPath,
+  boardSize,
+  word,
+  board,
+}: PathOverlayProps) {
+  if (!selectedPath.length || !word) return null;
 
   // Calculate cell size based on the board size (assuming square cells)
-  const cellSize = 100 / boardSize // as percentage
+  const cellSize = 100 / boardSize; // as percentage
 
   // Calculate the center position of a cell
   const getCellCenter = (row: number, col: number) => {
-    const x = col * cellSize + cellSize / 2
-    const y = row * cellSize + cellSize / 2
-    return { x, y }
-  }
+    const x = col * cellSize + cellSize / 2;
+    const y = row * cellSize + cellSize / 2;
+    return { x, y };
+  };
 
   // Generate path segments between consecutive cells
-  const pathSegments = []
+  const pathSegments = [];
 
   for (let i = 0; i < selectedPath.length - 1; i++) {
-    const [currentRow, currentCol] = selectedPath[i]
-    const [nextRow, nextCol] = selectedPath[i + 1]
+    const [currentRow, currentCol] = selectedPath[i];
+    const [nextRow, nextCol] = selectedPath[i + 1];
 
-    const start = getCellCenter(currentRow, currentCol)
-    const end = getCellCenter(nextRow, nextCol)
+    const start = getCellCenter(currentRow, currentCol);
+    const end = getCellCenter(nextRow, nextCol);
 
-    pathSegments.push({ start, end })
+    pathSegments.push({ start, end });
   }
 
   return (
@@ -47,5 +52,5 @@ export default function PathOverlay({ selectedPath, boardSize, word, board }: Pa
         ))}
       </svg>
     </div>
-  )
+  );
 }

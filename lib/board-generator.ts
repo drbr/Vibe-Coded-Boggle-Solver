@@ -1,6 +1,6 @@
 // Generate a random Boggle board with weighted letter distribution
 export function generateRandomBoard(rows: number, cols: number): string[][] {
-  const board: string[][] = []
+  const board: string[][] = [];
 
   // English letter frequency (roughly)
   const letterFrequency = {
@@ -30,113 +30,116 @@ export function generateRandomBoard(rows: number, cols: number): string[][] {
     x: 0.2,
     y: 2.0,
     z: 0.1,
-  }
+  };
 
   // Create a weighted array of letters
-  const letters: string[] = []
+  const letters: string[] = [];
   for (const [letter, frequency] of Object.entries(letterFrequency)) {
-    const count = Math.round(frequency * 10)
-    letters.push(...Array(count).fill(letter))
+    const count = Math.round(frequency * 10);
+    letters.push(...Array(count).fill(letter));
   }
 
   // Generate the board
   for (let i = 0; i < rows; i++) {
-    const row: string[] = []
+    const row: string[] = [];
     for (let j = 0; j < cols; j++) {
-      const randomIndex = Math.floor(Math.random() * letters.length)
-      row.push(letters[randomIndex])
+      const randomIndex = Math.floor(Math.random() * letters.length);
+      row.push(letters[randomIndex]);
     }
-    board.push(row)
+    board.push(row);
   }
 
   // Special case: ensure at least 5 vowels on the board
-  const vowels = ["a", "e", "i", "o", "u"]
-  let vowelCount = 0
+  const vowels = ['a', 'e', 'i', 'o', 'u'];
+  let vowelCount = 0;
 
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
       if (vowels.includes(board[i][j])) {
-        vowelCount++
+        vowelCount++;
       }
     }
   }
 
   // If we don't have enough vowels, replace some consonants
   if (vowelCount < 5) {
-    const cellsToReplace = 5 - vowelCount
-    const allCells = []
+    const cellsToReplace = 5 - vowelCount;
+    const allCells = [];
 
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
         if (!vowels.includes(board[i][j])) {
-          allCells.push([i, j])
+          allCells.push([i, j]);
         }
       }
     }
 
     // Shuffle and pick cells to replace
-    allCells.sort(() => Math.random() - 0.5)
+    allCells.sort(() => Math.random() - 0.5);
 
     for (let i = 0; i < Math.min(cellsToReplace, allCells.length); i++) {
-      const [row, col] = allCells[i]
-      board[row][col] = vowels[Math.floor(Math.random() * vowels.length)]
+      const [row, col] = allCells[i];
+      board[row][col] = vowels[Math.floor(Math.random() * vowels.length)];
     }
   }
 
-  return board
+  return board;
 }
 
 // For a more authentic Boggle experience, we can use the actual Boggle dice
-export function generateBoggleDiceBoard(rows: number, cols: number): string[][] {
+export function generateBoggleDiceBoard(
+  rows: number,
+  cols: number
+): string[][] {
   // Official Boggle dice (16 dice for a 4x4 game)
   const boggleDice = [
-    ["A", "A", "E", "E", "G", "N"],
-    ["A", "B", "B", "J", "O", "O"],
-    ["A", "C", "H", "O", "P", "S"],
-    ["A", "F", "F", "K", "P", "S"],
-    ["A", "O", "O", "T", "T", "W"],
-    ["C", "I", "M", "O", "T", "U"],
-    ["D", "E", "I", "L", "R", "X"],
-    ["D", "E", "L", "R", "V", "Y"],
-    ["D", "I", "S", "T", "T", "Y"],
-    ["E", "E", "G", "H", "N", "W"],
-    ["E", "E", "I", "N", "S", "U"],
-    ["E", "H", "R", "T", "V", "W"],
-    ["E", "I", "O", "S", "S", "T"],
-    ["E", "L", "R", "T", "T", "Y"],
-    ["H", "I", "M", "N", "U", "Qu"],
-    ["H", "L", "N", "N", "R", "Z"],
-  ]
+    ['A', 'A', 'E', 'E', 'G', 'N'],
+    ['A', 'B', 'B', 'J', 'O', 'O'],
+    ['A', 'C', 'H', 'O', 'P', 'S'],
+    ['A', 'F', 'F', 'K', 'P', 'S'],
+    ['A', 'O', 'O', 'T', 'T', 'W'],
+    ['C', 'I', 'M', 'O', 'T', 'U'],
+    ['D', 'E', 'I', 'L', 'R', 'X'],
+    ['D', 'E', 'L', 'R', 'V', 'Y'],
+    ['D', 'I', 'S', 'T', 'T', 'Y'],
+    ['E', 'E', 'G', 'H', 'N', 'W'],
+    ['E', 'E', 'I', 'N', 'S', 'U'],
+    ['E', 'H', 'R', 'T', 'V', 'W'],
+    ['E', 'I', 'O', 'S', 'S', 'T'],
+    ['E', 'L', 'R', 'T', 'T', 'Y'],
+    ['H', 'I', 'M', 'N', 'U', 'Qu'],
+    ['H', 'L', 'N', 'N', 'R', 'Z'],
+  ];
 
   // For boards other than 4x4, we'll need to adjust
   if (rows * cols !== 16) {
-    return generateRandomBoard(rows, cols)
+    return generateRandomBoard(rows, cols);
   }
 
   // Shuffle the dice
-  const shuffledDice = [...boggleDice].sort(() => Math.random() - 0.5)
+  const shuffledDice = [...boggleDice].sort(() => Math.random() - 0.5);
 
   // Create the board
-  const board: string[][] = []
-  let diceIndex = 0
+  const board: string[][] = [];
+  let diceIndex = 0;
 
   for (let i = 0; i < rows; i++) {
-    const row: string[] = []
+    const row: string[] = [];
     for (let j = 0; j < cols; j++) {
       // Roll the die (pick a random face)
-      const die = shuffledDice[diceIndex++]
-      const faceIndex = Math.floor(Math.random() * 6)
-      const letter = die[faceIndex].toLowerCase()
+      const die = shuffledDice[diceIndex++];
+      const faceIndex = Math.floor(Math.random() * 6);
+      const letter = die[faceIndex].toLowerCase();
 
       // Handle the special "Qu" case
-      if (letter === "qu") {
-        row.push("q") // We'll handle the 'u' in the UI
+      if (letter === 'qu') {
+        row.push('q'); // We'll handle the 'u' in the UI
       } else {
-        row.push(letter)
+        row.push(letter);
       }
     }
-    board.push(row)
+    board.push(row);
   }
 
-  return board
+  return board;
 }

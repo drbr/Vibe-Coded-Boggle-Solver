@@ -1,39 +1,44 @@
-"use client"
+'use client';
 
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils';
 
 interface WordListProps {
-  words: { word: string; path: number[][] }[]
-  selectedWord: string | null
-  onWordClick: (word: string, path: number[][]) => void
+  words: { word: string; path: number[][] }[];
+  selectedWord: string | null;
+  onWordClick: (word: string, path: number[][]) => void;
 }
 
-export default function WordList({ words, selectedWord, onWordClick }: WordListProps) {
+export default function WordList({
+  words,
+  selectedWord,
+  onWordClick,
+}: WordListProps) {
   // Group words by length for better organization
-  const wordsByLength = words.reduce(
-    (acc, { word, path }) => {
-      const length = word.length
-      if (!acc[length]) acc[length] = []
-      acc[length].push({ word, path })
-      return acc
-    },
-    {} as Record<number, { word: string; path: number[][] }[]>,
-  )
+  const wordsByLength = words.reduce((acc, { word, path }) => {
+    const length = word.length;
+    if (!acc[length]) acc[length] = [];
+    acc[length].push({ word, path });
+    return acc;
+  }, {} as Record<number, { word: string; path: number[][] }[]>);
 
   // Sort by word length (descending)
   const sortedLengths = Object.keys(wordsByLength)
     .map(Number)
-    .sort((a, b) => b - a)
+    .sort((a, b) => b - a);
 
   if (words.length === 0) {
     return (
       <div className="flex flex-col">
-        <h2 className="boggle-subtitle text-xl font-semibold mb-2">FOUND WORDS: 0</h2>
+        <h2 className="boggle-subtitle text-xl font-semibold mb-2">
+          FOUND WORDS: 0
+        </h2>
         <div className="word-list p-4 h-full flex items-center justify-center">
-          <p className="text-muted-foreground text-center">No words found on this board. Try generating a new board.</p>
+          <p className="text-muted-foreground text-center">
+            No words found on this board. Try generating a new board.
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -53,8 +58,10 @@ export default function WordList({ words, selectedWord, onWordClick }: WordListP
                 <button
                   key={word}
                   onClick={() => onWordClick(word, path)}
-                  className={cn("word-item px-3 py-1.5 text-left", selectedWord === word ? "selected" : "")}
-                >
+                  className={cn(
+                    'word-item px-3 py-1.5 text-left',
+                    selectedWord === word ? 'selected' : ''
+                  )}>
                   {word}
                 </button>
               ))}
@@ -63,5 +70,5 @@ export default function WordList({ words, selectedWord, onWordClick }: WordListP
         ))}
       </div>
     </div>
-  )
+  );
 }
