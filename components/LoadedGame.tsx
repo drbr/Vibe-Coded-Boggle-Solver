@@ -110,7 +110,7 @@ export function LoadedGame(props: LoadedGameProps) {
         </div>
 
         <div className="mt-4">
-          <NewGameDialog onNewGame={onNewGame} isLoading={false} currentMode={boardMode} />
+          <NewGameDialog onNewGame={onNewGame} currentMode={boardMode} />
         </div>
 
         <div className="mt-4 text-sm text-muted-foreground">

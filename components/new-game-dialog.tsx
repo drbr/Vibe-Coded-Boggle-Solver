@@ -17,61 +17,27 @@ import { BoardMode } from '@/lib/BoardTypes';
 
 interface NewGameDialogProps {
   onNewGame: (mode: BoardMode) => void;
-  isLoading: boolean;
   currentMode: BoardMode;
 }
 
-export function NewGameDialog({
-  onNewGame,
-  isLoading,
-  currentMode,
-}: NewGameDialogProps) {
+export function NewGameDialog({ onNewGame, currentMode }: NewGameDialogProps) {
   const [open, setOpen] = useState(false);
-  const [dialogLoading, setDialogLoading] = useState(false);
   const [selectedMode, setSelectedMode] = useState<BoardMode>(currentMode);
 
-  useEffect(() => {
-    // Reset dialog state when component mounts or when loading states change
-    if (isLoading || dialogLoading) {
-      setOpen(false);
-    }
-  }, [isLoading, dialogLoading]);
-
-  const handleGenerate = async () => {
-    try {
-      setDialogLoading(true);
-      setOpen(false);
-      await onNewGame(selectedMode);
-    } catch (error) {
-      console.error('Error generating new game:', error);
-    } finally {
-      setDialogLoading(false);
-    }
+  const handleGenerate = () => {
+    setOpen(false);
+    onNewGame(selectedMode);
   };
 
   return (
     <Dialog
       open={open}
       onOpenChange={(newOpen) => {
-        if (isLoading || dialogLoading) {
-          // Only allow closing, not opening during loading
-          if (!newOpen) setOpen(false);
-          return;
-        }
         setOpen(newOpen);
       }}>
       <DialogTrigger asChild>
-        <Button
-          className="w-full bg-boggle-accent hover:bg-boggle-accent/90 font-semibold"
-          disabled={isLoading || dialogLoading}>
-          {isLoading || dialogLoading ? (
-            <>
-              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
-              GENERATING...
-            </>
-          ) : (
-            'NEW GAME'
-          )}
+        <Button className="w-full bg-boggle-accent hover:bg-boggle-accent/90 font-semibold">
+          NEW GAME
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] bg-[#f9f5eb] border-[#d9c9a3] z-[100]">
@@ -79,9 +45,7 @@ export function NewGameDialog({
           <DialogTitle className="text-boggle-accent font-bold uppercase">
             Generate New Game
           </DialogTitle>
-          <DialogDescription>
-            Choose how you want to generate the Boggle board.
-          </DialogDescription>
+          <DialogDescription>Choose how you want to generate the Boggle board.</DialogDescription>
         </DialogHeader>
 
         <div className="py-4">
@@ -96,16 +60,13 @@ export function NewGameDialog({
                   id="dialog-boggle"
                   className="text-boggle-accent border-boggle-accent"
                 />
-                <Label
-                  htmlFor="dialog-boggle"
-                  className="cursor-pointer font-medium">
+                <Label htmlFor="dialog-boggle" className="cursor-pointer font-medium">
                   Authentic Boggle Dice
                 </Label>
               </div>
             </div>
             <p className="text-xs text-muted-foreground ml-6">
-              Uses the 16 official Boggle dice configuration for authentic
-              gameplay.
+              Uses the 16 official Boggle dice configuration for authentic gameplay.
             </p>
 
             <div className="flex items-start space-x-2">
@@ -115,9 +76,7 @@ export function NewGameDialog({
                   id="dialog-random"
                   className="text-boggle-accent border-boggle-accent"
                 />
-                <Label
-                  htmlFor="dialog-random"
-                  className="cursor-pointer font-medium">
+                <Label htmlFor="dialog-random" className="cursor-pointer font-medium">
                   Random Letters
                 </Label>
               </div>
@@ -132,13 +91,11 @@ export function NewGameDialog({
           <Button
             variant="outline"
             onClick={() => setOpen(false)}
-            disabled={dialogLoading}
             className="border-[#d9c9a3] hover:bg-[#f0e6d2] hover:text-foreground font-medium">
             CANCEL
           </Button>
           <Button
             onClick={handleGenerate}
-            disabled={dialogLoading}
             className="bg-boggle-accent hover:bg-boggle-accent/90 font-medium">
             GENERATE BOARD
           </Button>
