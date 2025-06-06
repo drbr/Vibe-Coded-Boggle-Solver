@@ -37,8 +37,7 @@ export function LoadedGame(props: LoadedGameProps) {
   // in a subcomponent and rendering it with a new key every time the word list changes
   // (perhaps represented by the concatenation of letters in the board).
   useEffect(() => {
-    const first = foundWords[0] ?? null;
-    setSelectedWordAndPath(first);
+    setSelectedWordAndPath(null);
   }, [foundWords]);
 
   const handleWordClick = (foundWord: FoundWord) => {
@@ -111,23 +110,17 @@ export function LoadedGame(props: LoadedGameProps) {
         </div>
 
         <div className="mt-4">
-          <NewGameDialog
-            onNewGame={onNewGame}
-            isLoading={false}
-            currentMode={boardMode}
-          />
+          <NewGameDialog onNewGame={onNewGame} isLoading={false} currentMode={boardMode} />
         </div>
 
         <div className="mt-4 text-sm text-muted-foreground">
           <p>
             <strong>Current mode:</strong>{' '}
-            {boardMode === 'boggle'
-              ? 'Authentic Boggle Dice'
-              : 'Random Letters'}
+            {boardMode === 'boggle' ? 'Authentic Boggle Dice' : 'Random Letters'}
           </p>
           <p className="mt-1">
-            <strong>Tip:</strong> Click "Edit Letters" to customize the board.
-            Use arrow keys to navigate and Enter to save.
+            <strong>Tip:</strong> Click "Edit Letters" to customize the board. Use arrow keys to
+            navigate and Enter to save.
           </p>
         </div>
       </div>
