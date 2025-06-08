@@ -27,10 +27,7 @@ type LoadingAction =
   | { type: 'ERROR' }
   | { type: 'UPDATE_BOARD'; board: Board; mode: BoardMode };
 
-function loadingStateReducer(
-  state: LoadingState,
-  action: LoadingAction
-): LoadingState {
+function loadingStateReducer(state: LoadingState, action: LoadingAction): LoadingState {
   switch (state.name) {
     case 'loadingDictionary':
       switch (action.type) {
@@ -100,9 +97,7 @@ export default function Page() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f9f5eb]">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4 text-boggle-accent">
-            Loading dictionary…
-          </h2>
+          <h2 className="text-2xl font-bold mb-4 text-boggle-accent">Loading dictionary…</h2>
           <div className="w-16 h-16 border-4 border-boggle-accent border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       </div>
@@ -113,9 +108,7 @@ export default function Page() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f9f5eb]">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4 text-boggle-accent">
-            Failed to load dictionary!
-          </h2>
+          <h2 className="text-2xl font-bold mb-4 text-boggle-accent">Failed to load dictionary!</h2>
         </div>
       </div>
     );
@@ -123,11 +116,10 @@ export default function Page() {
 
   const { dictionary, board, mode } = loadState;
   return (
-    <main className="flex min-h-screen flex-col items-center p-4 md:p-8 bg-[#f9f5eb]">
+    <main className="flex h-screen flex-col items-center p-4 md:p-8 bg-[#f9f5eb]">
       <h1 className="boggle-title text-4xl font-bold mb-2">BOGGLE SOLVER</h1>
       <p className="text-muted-foreground mb-6">
-        Using {dictionary.size.toLocaleString()} words from the Scrabble
-        dictionary
+        Using {dictionary.size.toLocaleString()} words from the Scrabble dictionary
       </p>
       <LoadedGame
         boardMode={mode}

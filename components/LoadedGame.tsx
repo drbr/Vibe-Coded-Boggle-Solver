@@ -77,8 +77,8 @@ export function LoadedGame(props: LoadedGameProps) {
   };
 
   return (
-    <div className="flex flex-col md:flex-row w-full max-w-4xl gap-8">
-      <div className="w-full md:w-1/2 md:sticky md:top-8 md:self-start">
+    <div className="flex flex-col md:overflow-hidden md:flex-row w-full max-w-4xl gap-8">
+      <div className="w-full md:w-1/2 md:sticky md:self-start">
         <div ref={boggleBoardRef}>
           <BoggleBoard
             board={board}
