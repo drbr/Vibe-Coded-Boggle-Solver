@@ -5,7 +5,7 @@ import { LoadedGame } from '@/components/LoadedGame';
 import { loadDictionary } from '@/lib/dictionary';
 import { Trie } from '@/lib/trie';
 import { generateNewBoard } from '../lib/generateNewBoard';
-import { Board, BoardMode } from '@/lib/BoardTypes';
+import { Board, boardKey, BoardMode } from '@/lib/BoardTypes';
 
 type LoadingState =
   | { name: 'loadingDictionary' }
@@ -122,6 +122,9 @@ export default function Page() {
         Using {dictionary.size.toLocaleString()} words from the Scrabble dictionary
       </p>
       <LoadedGame
+        // Mount a new board component whenever the letters change. In particular, this prevents the
+        // game from staying in edit mode if you choose "new game" while editing.
+        key={boardKey(board)}
         boardMode={mode}
         board={board}
         dictionary={dictionary}
